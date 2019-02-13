@@ -9,6 +9,7 @@ namespace MemoryObserver
 {
     class Program
     {
+
         static Process GetValidProcess()
         {
             bool isValid = false;
@@ -32,21 +33,25 @@ namespace MemoryObserver
 
         static void PrintProcesses()
         {
+            const string format = "{0,-40} {1}";
             var allProcesses = Process.GetProcesses();
+            Console.WriteLine(format, "Process Name", "Id");
             foreach (Process process in allProcesses)
             {
-                Console.WriteLine("{0} {1}", process.ProcessName, process.Id);
+                Console.WriteLine(format, process.ProcessName, process.Id);
             }
         }
 
         static void ListThreads()
         {
+            const string format = "{0,-10} {1}";
             var process = GetValidProcess();
             try
             {
-                foreach(ProcessThread thread in process.Threads)
+                Console.WriteLine(format, "Thread Id", "Start Time");
+                foreach (ProcessThread thread in process.Threads)
                 {
-                    Console.WriteLine("{0} {1}", thread.StartTime, thread.Id);
+                    Console.WriteLine(format, thread.Id, thread.StartTime);
                 }
             }
             catch(System.ComponentModel.Win32Exception ex)
@@ -57,18 +62,27 @@ namespace MemoryObserver
 
         static void PrintModules()
         {
+            const string format = "{0,-32} {1}";
             var process = GetValidProcess();
             try
             {
+                Console.WriteLine(format, "Module Name", "Entry Point Address");
                 foreach (ProcessModule module in process.Modules)
                 {
-                    Console.WriteLine("{0} {1}", module.ModuleName, module.EntryPointAddress);
+                    Console.WriteLine(format, module.ModuleName, module.EntryPointAddress.ToString("X"));
                 }
             }
             catch (System.ComponentModel.Win32Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
+        }
+
+        static void ShowExecutablePages()
+        {
+            var process = GetValidProcess();
+            
+
         }
 
         static void Main(string[] args)
@@ -101,53 +115,14 @@ namespace MemoryObserver
                         PrintModules();
                         break;
                     case ConsoleKey.F4:
+                        ShowExecutablePages();
                         break;
                     case ConsoleKey.F5:
                         break;
+                    default:
+                        break;
                 }
-
             } while (choice.Key != ConsoleKey.Escape);
-
-
-            //using (Process myProcess = new Process())
-            //{
-            //    // Get the process start information of notepad.
-            //    ProcessStartInfo myProcessStartInfo = new ProcessStartInfo("notepad.exe");
-            //    // Assign 'StartInfo' of notepad to 'StartInfo' of 'myProcess' object.
-            //    myProcess.StartInfo = myProcessStartInfo;
-            //    // Create a notepad.
-            //    myProcess.Start();
-            //    System.Threading.Thread.Sleep(1000);
-            //    ProcessModule myProcessModule;
-            //    // Get all the modules associated with 'myProcess'.
-            //    ProcessModuleCollection myProcessModuleCollection = myProcess.Modules;
-            //    Console.WriteLine("Properties of the modules  associated with 'notepad' are:");
-            //    // Display the properties of each of the modules.
-            //    for (int i = 0; i < myProcessModuleCollection.Count; i++)
-            //    {
-            //        myProcessModule = myProcessModuleCollection[i];
-            //        Console.WriteLine("The moduleName is "
-            //            + myProcessModule.ModuleName);
-            //        Console.WriteLine("The " + myProcessModule.ModuleName + "'s base address is: "
-            //            + myProcessModule.BaseAddress);
-            //        Console.WriteLine("The " + myProcessModule.ModuleName + "'s Entry point address is: "
-            //            + myProcessModule.EntryPointAddress);
-            //        Console.WriteLine("The " + myProcessModule.ModuleName + "'s File name is: "
-            //            + myProcessModule.FileName);
-            //    }
-            //    // Get the main module associated with 'myProcess'.
-            //    myProcessModule = myProcess.MainModule;
-            //    // Display the properties of the main module.
-            //    Console.WriteLine("The process's main moduleName is:  "
-            //        + myProcessModule.ModuleName);
-            //    Console.WriteLine("The process's main module's base address is: "
-            //        + myProcessModule.BaseAddress);
-            //    Console.WriteLine("The process's main module's Entry point address is: "
-            //        + myProcessModule.EntryPointAddress);
-            //    Console.WriteLine("The process's main module's File name is: "
-            //        + myProcessModule.FileName);
-            //    myProcess.CloseMainWindow();
-            //}
         }
     }
 }
