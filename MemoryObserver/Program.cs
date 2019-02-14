@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,8 @@ namespace MemoryObserver
 {
     class Program
     {
-
+        const int PROCESS_VM_READ = 0x0010;
+        
         static Process GetValidProcess()
         {
             bool isValid = false;
@@ -54,7 +56,7 @@ namespace MemoryObserver
                     Console.WriteLine(format, thread.Id, thread.StartTime);
                 }
             }
-            catch(System.ComponentModel.Win32Exception ex)
+            catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
@@ -72,7 +74,7 @@ namespace MemoryObserver
                     Console.WriteLine(format, module.ModuleName, module.EntryPointAddress.ToString("X"));
                 }
             }
-            catch (System.ComponentModel.Win32Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
@@ -82,9 +84,35 @@ namespace MemoryObserver
         {
             var process = GetValidProcess();
             
-
+            //todo: implement
         }
 
+        static void ShowProcessMemory()
+        {
+            var process = GetValidProcess();
+
+            try
+            {
+                var lpBaseAddress = process.MainModule.BaseAddress.ToInt64();
+                var moduleSize = process.MainModule.ModuleMemorySize;
+                var lpBuffer = new byte[moduleSize];
+                int lpNumberOfBytesRead = 0;
+
+                Toolhelp32ReadProcessMemory(process.Id, lpBaseAddress, lpBuffer, lpBuffer.Length, ref lpNumberOfBytesRead);
+                var hexDump = BitConverter.ToString(lpBuffer).Replace("-", "");
+
+                Console.WriteLine(hexDump);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        [DllImport("kernel32.dll")]
+        public static extern bool Toolhelp32ReadProcessMemory(int th32ProcessID, Int64 lpBaseAddress, byte[] lpBuffer, int cbRead, ref int lpNumberOfBytesRead);
+    
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome to MemoryObserver. Please choose an option from the following:");
@@ -118,6 +146,7 @@ namespace MemoryObserver
                         ShowExecutablePages();
                         break;
                     case ConsoleKey.F5:
+                        ShowProcessMemory();
                         break;
                     default:
                         break;
