@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MemoryObserver
 {
@@ -68,23 +64,16 @@ namespace MemoryObserver
             var process = GetValidProcess();
             try
             {
-                Console.WriteLine(format, "Module Name", "Entry Point Address");
+                Console.WriteLine(format, "Module Name", "Base Address");
                 foreach (ProcessModule module in process.Modules)
                 {
-                    Console.WriteLine(format, module.ModuleName, module.EntryPointAddress.ToString("X"));
+                    Console.WriteLine(format, module.ModuleName, module.BaseAddress.ToString("X"));
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
-        }
-
-        static void ShowExecutablePages()
-        {
-            var process = GetValidProcess();
-            
-            //todo: implement
         }
 
         static void ShowProcessMemory()
@@ -124,8 +113,7 @@ namespace MemoryObserver
                 Console.WriteLine("F1 - Enumerate running processes");
                 Console.WriteLine("F2 - List running threads within a process boundary");
                 Console.WriteLine("F3 - Enumerate loaded modules within a process");
-                Console.WriteLine("F4 - Show executable pages within a process");
-                Console.WriteLine("F5 - Read the memory of a process");
+                Console.WriteLine("F4 - Read executable pages of a process");
                 Console.WriteLine("Esc - Exit");
                 Console.Write("> ");
 
@@ -143,9 +131,6 @@ namespace MemoryObserver
                         PrintModules();
                         break;
                     case ConsoleKey.F4:
-                        ShowExecutablePages();
-                        break;
-                    case ConsoleKey.F5:
                         ShowProcessMemory();
                         break;
                     default:
